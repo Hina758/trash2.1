@@ -1,10 +1,9 @@
 {
-  "name": "trash-game-final-working",
+  "name": "trash-game-final-version",
   "version": "1.0.0",
-  "description": "Fully working version of Trash Game.",
-  "main": "server/server.js",
+  "main": "server.js",
   "scripts": {
-    "start": "node server/server.js"
+    "start": "node server.js"
   },
   "dependencies": {
     "cors": "^2.8.5",
