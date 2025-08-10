@@ -1,0 +1,14 @@
+{
+  "name": "trash-game-v2",
+  "version": "2.0.0",
+  "description": "Trash Game V2 with various modes and user accounts.",
+  "main": "server/server.js",
+  "scripts": {
+    "start": "node server/server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  },
+  "author": "EFAS",
+  "license": "ISC"
+}

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>홈 - Trash Game</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .home-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 50px; width: 100%; max-width: 600px; }
+        #welcome-message { font-size: 1.5rem; color: #eee; }
+        .btn-small { padding: 8px 15px; font-size: 0.9rem; }
+        .home-main { display: flex; flex-direction: column; gap: 20px; width: 100%; max-width: 400px; }
+        .btn-large { padding: 20px 30px; font-size: 1.5rem; }
+        .guest-auth-buttons { display: none; flex-direction: row; gap: 15px; margin-top: 40px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="home-header">
+            <h1 id="welcome-message">...님, 환영합니다!</h1>
+            <button id="logout-button" class="btn btn-secondary btn-small">로그아웃</button>
+        </header>
+
+        <main class="home-main">
+            <a href="mode_select.html" class="btn btn-large">🎮 게임 플레이</a>
+            <a href="account.html" id="account-button" class="btn btn-large">👤 계정 정보</a>
+            <a href="leaderboard.html" class="btn btn-large">🏆 순위표</a>
+        </main>
+
+        <!-- 게스트용 로그인/회원가입 버튼 -->
+        <div id="guest-auth-buttons" class="guest-auth-buttons">
+            <a href="login.html" class="btn">로그인</a>
+            <a href="signup.html" class="btn">회원가입</a>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const welcomeMessage = document.getElementById('welcome-message');
+            const logoutButton = document.getElementById('logout-button');
+            const accountButton = document.getElementById('account-button');
+            const guestAuthButtons = document.getElementById('guest-auth-buttons');
+
+            const userData = sessionStorage.getItem('loggedInUser');
+
+            if (userData) {
+                const user = JSON.parse(userData);
+                welcomeMessage.textContent = `${user.username}님, 환영합니다!`;
+            } else {
+                welcomeMessage.textContent = '게스트님, 환영합니다!';
+                logoutButton.style.display = 'none';
+                accountButton.style.display = 'none';
+                guestAuthButtons.style.display = 'flex'; // 게스트일 때 버튼 표시
+            }
+
+            logoutButton.addEventListener('click', () => {
+                sessionStorage.removeItem('loggedInUser');
+                window.location.href = 'index.html';
+            });
+        });
+    </script>
+</body>
+</html>

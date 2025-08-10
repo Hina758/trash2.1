@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>순위표 - Trash Game</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/leaderboard.css">
+</head>
+<body>
+    <div class="leaderboard-container">
+        <h1 class="leaderboard-title">🏆 순위표 🏆</h1>
+        <div class="tab-container">
+            <button class="tab-btn active" data-mode="classic">클래식</button>
+            <button class="tab-btn" data-mode="infinite">무한 모드</button>
+            <button class="tab-btn" data-mode="online">온라인 대전</button>
+        </div>
+        <table class="leaderboard-table">
+            <thead>
+                <tr>
+                    <th>순위</th>
+                    <th>이름</th>
+                    <th id="score-header">점수</th>
+                </tr>
+            </thead>
+            <tbody id="leaderboard-body">
+                <!-- 순위 데이터가 여기에 동적으로 추가됩니다. -->
+            </tbody>
+        </table>
+        <a href="home.html" class="btn btn-secondary" style="margin-top: 30px;">홈으로 돌아가기</a>
+    </div>
+    <script src="js/leaderboard.js"></script>
+</body>
+</html>

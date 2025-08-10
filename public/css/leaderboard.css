@@ -1,0 +1,80 @@
+/* leaderboard.css - 순위표 페이지 전용 스타일 */
+
+.leaderboard-container {
+    width: 100%;
+    max-width: 800px;
+    background-color: #2c2c2c;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+}
+
+.leaderboard-title {
+    font-size: 2.5rem;
+    color: #4CAF50;
+    margin-bottom: 20px;
+}
+
+.tab-container {
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.tab-btn {
+    padding: 10px 20px;
+    font-size: 1rem;
+    font-family: 'Jua', sans-serif;
+    border: 2px solid #555;
+    background-color: transparent;
+    color: #ccc;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.tab-btn.active {
+    background-color: #4CAF50;
+    color: white;
+    border-color: #4CAF50;
+}
+
+.leaderboard-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.leaderboard-table th, .leaderboard-table td {
+    padding: 12px 15px;
+    text-align: center;
+    border-bottom: 1px solid #444;
+}
+
+.leaderboard-table th {
+    background-color: #333;
+    font-size: 1.1rem;
+}
+
+.leaderboard-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.leaderboard-table tbody tr:hover {
+    background-color: #3a3a3a;
+}
+
+/* 순위별 스타일 */
+.rank-1 { font-weight: bold; color: #FFD700; } /* 금색 */
+.rank-2 { font-weight: bold; color: #C0C0C0; } /* 은색 */
+.rank-3 { font-weight: bold; color: #CD7F32; } /* 동색 */
+
+.username-cell {
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.username-cell:hover {
+    color: #4CAF50;
+}

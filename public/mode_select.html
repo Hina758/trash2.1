@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>모드 선택 - Trash Game</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .mode-container { display: flex; justify-content: center; gap: 30px; flex-wrap: wrap; /* flex-wrap 추가 */ }
+        .mode-card { background-color: #2c2c2c; border: 2px solid #444; border-radius: 12px; padding: 30px; width: 280px; transition: transform 0.3s, box-shadow 0.3s; }
+        .mode-card:hover { transform: translateY(-10px); box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4); }
+        .mode-title { font-size: 1.8rem; color: #4CAF50; margin-bottom: 15px; }
+        .mode-description { font-size: 0.95rem; line-height: 1.5; height: 100px; color: #ccc; }
+        .difficulty-select { width: 100%; padding: 10px; font-family: 'Jua', sans-serif; font-size: 1rem; border-radius: 6px; margin: 20px 0; }
+        .disabled-card { opacity: 0.6; cursor: not-allowed; }
+        .disabled-card .btn { background-color: #555; pointer-events: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>모드 선택</h1>
+        <div class="mode-container">
+            <!-- 클래식 모드 카드 -->
+            <div class="mode-card">
+                <h2 class="mode-title">클래식 모드</h2>
+                <p class="mode-description">총 10개의 문제를 푸는 기본 모드입니다. 난이도에 따라 문제당 획득 점수가 달라집니다.</p>
+                <select id="difficulty-classic" class="difficulty-select">
+                    <option value="easy">쉬움 (문제당 10점)</option>
+                    <option value="normal">보통 (문제당 15점)</option>
+                    <option value="hard">어려움 (문제당 25점)</option>
+                </select>
+                <button onclick="startGame('classic')" class="btn">클래식 시작</button>
+            </div>
+            <!-- 무한 모드 카드 -->
+            <div class="mode-card">
+                <h2 class="mode-title">무한 모드</h2>
+                <p class="mode-description">목숨 3개를 가지고 시작합니다. 문제를 틀릴 때마다 목숨이 1개씩 줄어들며, 모두 소진되면 게임이 종료됩니다.</p>
+                <select id="difficulty-infinite" class="difficulty-select">
+                    <option value="easy">쉬움</option>
+                    <option value="normal">보통</option>
+                    <option value="hard">어려움</option>
+                </select>
+                <button onclick="startGame('infinite')" class="btn">무한 모드 시작</button>
+            </div>
+            <!-- 온라인 경쟁 카드 -->
+            <div id="online-card" class="mode-card">
+                <h2 class="mode-title">온라인 경쟁</h2>
+                <p class="mode-description">다른 유저와 1:1로 매칭되어, 10개의 동일한 문제를 누가 더 빠르고 정확하게 푸는지 겨룹니다.</p>
+                <button id="online-start-btn" onclick="startGame('online')" class="btn" style="margin-top: 55px;">대전 상대 찾기</button>
+            </div>
+        </div>
+        <a href="home.html" class="btn btn-secondary" style="margin-top: 40px;">홈으로 돌아가기</a>
+    </div>
+    <script>
+        function startGame(mode) {
+            const difficultySelect = document.getElementById(`difficulty-${mode}`);
+            const difficulty = difficultySelect ? difficultySelect.value : 'normal';
+            sessionStorage.setItem('currentGameMode', mode);
+            sessionStorage.setItem('currentGameDifficulty', difficulty);
+            window.location.href = `game_${mode}.html`;
+        }
+        document.addEventListener('DOMContentLoaded', () => {
+            const userData = sessionStorage.getItem('loggedInUser');
+            if (!userData) {
+                const onlineCard = document.getElementById('online-card');
+                onlineCard.classList.add('disabled-card');
+                onlineCard.querySelector('.mode-description').textContent += '\n(로그인 필요)';
+            }
+        });
+    </script>
+</body>
+</html>

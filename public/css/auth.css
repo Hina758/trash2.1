@@ -1,0 +1,87 @@
+/* auth.css - 로그인/회원가입 페이지 전용 스타일 */
+
+.auth-container {
+    background-color: #2c2c2c;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+    width: 100%;
+    max-width: 400px;
+}
+
+.auth-title {
+    font-size: 2rem;
+    margin-bottom: 30px;
+    color: #4CAF50;
+}
+
+.form-group {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 1rem;
+    color: #ccc;
+}
+
+.form-control {
+    width: 100%;
+    padding: 12px;
+    font-size: 1rem;
+    font-family: 'Jua', sans-serif;
+    border-radius: 6px;
+    border: 2px solid #555;
+    background-color: #333;
+    color: #fff;
+    box-sizing: border-box; /* 패딩과 테두리를 너비에 포함 */
+    transition: border-color 0.3s;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: #4CAF50;
+}
+
+.btn-submit {
+    width: 100%;
+    padding: 15px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.message {
+    margin-top: 20px;
+    padding: 10px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    display: none; /* 기본적으로 숨김 */
+}
+
+.message.success {
+    background-color: #28a745;
+    color: white;
+}
+
+.message.error {
+    background-color: #dc3545;
+    color: white;
+}
+
+.link-container {
+    margin-top: 25px;
+    font-size: 0.9rem;
+}
+
+.link-container a {
+    color: #4CAF50;
+    text-decoration: none;
+    transition: text-decoration 0.3s;
+}
+
+.link-container a:hover {
+    text-decoration: underline;
+}

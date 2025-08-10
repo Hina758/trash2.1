@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>게임 결과 - Trash Game</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h1 class="card-title">게임 결과</h1>
+            <div id="result-details" class="card-content">
+                <p><strong>모드:</strong> <span id="result-mode"></span></p>
+                <p><strong>점수:</strong> <span id="result-score"></span></p>
+                <p id="combo-p"><strong>최대 콤보:</strong> <span id="result-combo"></span></p>
+                <p id="opponent-p"><strong>상대:</strong> <span id="result-opponent"></span></p>
+            </div>
+            <div class="button-container" style="flex-direction: row; justify-content: center;">
+                <a href="mode_select.html" class="btn">다시 플레이</a>
+                <a href="leaderboard.html" class="btn">순위표 보기</a>
+                <a href="home.html" class="btn btn-secondary">홈으로</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const resultData = JSON.parse(sessionStorage.getItem('lastGameResult'));
+
+            if (!resultData) {
+                document.getElementById('result-details').textContent = '결과를 불러올 수 없습니다.';
+                return;
+            }
+
+            document.getElementById('result-mode').textContent = resultData.mode;
+            document.getElementById('result-score').textContent = resultData.score.toLocaleString();
+            
+            if (resultData.maxCombo !== undefined) {
+                document.getElementById('result-combo').textContent = resultData.maxCombo;
+                document.getElementById('opponent-p').style.display = 'none';
+            } else {
+                document.getElementById('combo-p').style.display = 'none';
+                document.getElementById('result-opponent').textContent = resultData.opponent;
+            }
+        });
+    </script>
+</body>
+</html>
