@@ -1,39 +1,69 @@
-const express = require("express");
-const router = express.Router();
-const { readJSON, writeJSON } = require("../utils/fileHandler");
+document.addEventListener('DOMContentLoaded', () => {
+    const signupForm = document.getElementById('signup-form');
+    const loginForm = document.getElementById('login-form');
+    const messageArea = document.getElementById('message-area');
 
-const USERS_FILE = "users.json";
+    const showMessage = (message, isSuccess) => {
+        if (!messageArea) return;
+        messageArea.textContent = message;
+        messageArea.className = 'message';
+        messageArea.classList.add(isSuccess ? 'success' : 'error');
+        messageArea.style.display = 'block';
+    };
 
-// 회원가입
-router.post("/signup", (req, res) => {
-    const { username, password } = req.body;
-    if (!username || !password) {
-        return res.status(400).json({ message: "아이디와 비밀번호를 입력하세요." });
+    if (signupForm) {
+        signupForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const passwordConfirm = document.getElementById('password-confirm').value;
+
+            if (password !== passwordConfirm) {
+                return showMessage('비밀번호가 일치하지 않습니다.', false);
+            }
+
+            try {
+                const response = await fetch(`${API_URL}/api/auth/signup`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                const result = await response.json();
+                if (response.ok) {
+                    showMessage(result.message, true);
+                    signupForm.style.display = 'none';
+                    document.getElementById('home-button-container').classList.remove('hidden');
+                } else {
+                    showMessage(result.message || '오류가 발생했습니다.', false);
+                }
+            } catch (error) {
+                showMessage('네트워크 오류가 발생했습니다.', false);
+            }
+        });
     }
 
-    let users = readJSON(USERS_FILE);
-    if (users.find(u => u.username === username)) {
-        return res.status(400).json({ message: "이미 존재하는 아이디입니다." });
+    if (loginForm) {
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                const response = await fetch(`${API_URL}/api/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                const result = await response.json();
+                if (response.ok) {
+                    sessionStorage.setItem('loggedInUser', JSON.stringify(result.user));
+                    window.location.href = 'home.html';
+                } else {
+                    showMessage(result.message || '오류가 발생했습니다.', false);
+                }
+            } catch (error) {
+                showMessage('네트워크 오류가 발생했습니다.', false);
+            }
+        });
     }
-
-    const newUser = { username, password, scores: { classic: 0, infinite: 0, online: 0 } };
-    users.push(newUser);
-    writeJSON(USERS_FILE, users);
-
-    res.json({ message: "회원가입 성공!" });
 });
-
-// 로그인
-router.post("/login", (req, res) => {
-    const { username, password } = req.body;
-    let users = readJSON(USERS_FILE);
-
-    const user = users.find(u => u.username === username && u.password === password);
-    if (!user) {
-        return res.status(401).json({ message: "아이디 또는 비밀번호가 올바르지 않습니다." });
-    }
-
-    res.json({ message: "로그인 성공", user });
-});
-
-module.exports = router;

@@ -40,14 +40,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await fetch(`${API_URL}/api/auth/title`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    username: userData.username,
-                    title: newTitle,
-                    titleColor: newTitleColor
-                })
+                body: JSON.stringify({ username: userData.username, title: newTitle, titleColor: newTitleColor })
             });
             const result = await response.json();
-            if (result.success) {
+            if (response.ok) {
                 updateMessage.textContent = '칭호가 성공적으로 변경되었습니다!';
                 updateMessage.style.color = 'lightgreen';
                 userData.title = newTitle;

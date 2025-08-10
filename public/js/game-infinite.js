@@ -15,13 +15,9 @@ document.addEventListener('DOMContentLoaded', () => {
         { item: '다 쓴 건전지', category: '건전지 전용수거함' }, { item: '종이컵', category: '종이' },
         { item: '알루미늄 호일', category: '일반쓰레기' }, { item: '과일 껍질', category: '음식물쓰레기' },
     ];
-    const CATEGORIES = ['플라스틱', '비닐', '일반쓰레기', '캔류', '종이', '병류', '스티로폼', '형광등 전용수거함', '건전지 전용수거함', '음식물쓰레기'];
+    const CATEGORIES = [...new Set(TRASH_DATA.map(d => d.category))];
 
-    let lives = 3;
-    let score = 0;
-    let currentCombo = 0;
-    let maxCombo = 0;
-    let currentQuestionIndex = -1;
+    let lives = 3, score = 0, currentCombo = 0, maxCombo = 0, currentQuestionIndex = -1;
     let questions = [];
     let isAnswerable = true;
 
@@ -41,10 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function displayNextQuestion() {
         currentQuestionIndex++;
-        if (currentQuestionIndex >= questions.length) {
-            shuffleQuestions();
-            currentQuestionIndex = 0;
-        }
+        if (currentQuestionIndex >= questions.length) shuffleQuestions();
         
         isAnswerable = true;
         const currentQuestion = questions[currentQuestionIndex];
@@ -54,9 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let options = [correctAnswer];
         while (options.length < 4) {
             const randomCategory = CATEGORIES[Math.floor(Math.random() * CATEGORIES.length)];
-            if (!options.includes(randomCategory)) {
-                options.push(randomCategory);
-            }
+            if (!options.includes(randomCategory)) options.push(randomCategory);
         }
         options.sort(() => 0.5 - Math.random());
 
@@ -65,19 +56,18 @@ document.addEventListener('DOMContentLoaded', () => {
             const button = document.createElement('button');
             button.textContent = option;
             button.classList.add('answer-btn');
-            button.addEventListener('click', () => handleAnswer(option, correctAnswer, button));
+            button.addEventListener('click', () => handleAnswer(option === correctAnswer, button, correctAnswer));
             answersArea.appendChild(button);
         });
     }
 
-    function handleAnswer(selectedOption, correctOption, button) {
+    function handleAnswer(isCorrect, button, correctAnswer) {
         if (!isAnswerable) return;
         isAnswerable = false;
 
-        const allButtons = answersArea.querySelectorAll('.answer-btn');
-        allButtons.forEach(btn => btn.disabled = true);
+        document.querySelectorAll('.answer-btn').forEach(btn => btn.disabled = true);
 
-        if (selectedOption === correctOption) {
+        if (isCorrect) {
             score += pointsPerCorrect * (1 + currentCombo * 0.1);
             currentCombo++;
             if (currentCombo > maxCombo) maxCombo = currentCombo;
@@ -87,19 +77,14 @@ document.addEventListener('DOMContentLoaded', () => {
             currentCombo = 0;
             updateLivesDisplay();
             button.classList.add('wrong');
-            allButtons.forEach(btn => {
-                if (btn.textContent === correctOption) btn.classList.add('correct');
+            document.querySelectorAll('.answer-btn').forEach(btn => {
+                if (btn.textContent === correctAnswer) btn.classList.add('correct');
             });
         }
-
         scoreEl.textContent = Math.floor(score);
         comboEl.textContent = `x${currentCombo}`;
-
-        if (lives <= 0) {
-            setTimeout(endGame, 1000);
-        } else {
-            setTimeout(displayNextQuestion, 1000);
-        }
+        if (lives <= 0) setTimeout(endGame, 1200);
+        else setTimeout(displayNextQuestion, 1200);
     }
     
     function updateLivesDisplay() {
@@ -109,24 +94,14 @@ document.addEventListener('DOMContentLoaded', () => {
     async function endGame() {
         questionTextEl.textContent = '게임 오버!';
         answersArea.innerHTML = '';
-        
-        sessionStorage.setItem('lastGameResult', JSON.stringify({
-            mode: '무한 모드',
-            score: Math.floor(score),
-            maxCombo
-        }));
+        sessionStorage.setItem('lastGameResult', JSON.stringify({ mode: '무한 모드', score: Math.floor(score), maxCombo }));
 
         const userData = JSON.parse(sessionStorage.getItem('loggedInUser'));
         if (userData) {
             await fetch(`${API_URL}/api/scores/submit`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    username: userData.username,
-                    mode: 'infinite',
-                    score: Math.floor(score),
-                    combo: maxCombo
-                })
+                body: JSON.stringify({ username: userData.username, mode: 'infinite', score: Math.floor(score), combo: maxCombo })
             });
         }
         window.location.href = 'game_result.html';
