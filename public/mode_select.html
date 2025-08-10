@@ -6,7 +6,11 @@
     <title>모드 선택 - Trash Game</title>
     <link rel="stylesheet" href="css/style.css">
     <style>
-        .mode-container { display: flex; justify-content: center; gap: 30px; flex-wrap: wrap; /* flex-wrap 추가 */ }
+        /* 이 페이지의 컨테이너만 너비를 넓게 설정 */
+        .container {
+            max-width: 1000px;
+        }
+        .mode-container { display: flex; justify-content: center; gap: 30px; flex-wrap: wrap; }
         .mode-card { background-color: #2c2c2c; border: 2px solid #444; border-radius: 12px; padding: 30px; width: 280px; transition: transform 0.3s, box-shadow 0.3s; }
         .mode-card:hover { transform: translateY(-10px); box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4); }
         .mode-title { font-size: 1.8rem; color: #4CAF50; margin-bottom: 15px; }
@@ -20,7 +24,6 @@
     <div class="container">
         <h1>모드 선택</h1>
         <div class="mode-container">
-            <!-- 클래식 모드 카드 -->
             <div class="mode-card">
                 <h2 class="mode-title">클래식 모드</h2>
                 <p class="mode-description">총 10개의 문제를 푸는 기본 모드입니다. 난이도에 따라 문제당 획득 점수가 달라집니다.</p>
@@ -31,7 +34,6 @@
                 </select>
                 <button onclick="startGame('classic')" class="btn">클래식 시작</button>
             </div>
-            <!-- 무한 모드 카드 -->
             <div class="mode-card">
                 <h2 class="mode-title">무한 모드</h2>
                 <p class="mode-description">목숨 3개를 가지고 시작합니다. 문제를 틀릴 때마다 목숨이 1개씩 줄어들며, 모두 소진되면 게임이 종료됩니다.</p>
@@ -42,7 +44,6 @@
                 </select>
                 <button onclick="startGame('infinite')" class="btn">무한 모드 시작</button>
             </div>
-            <!-- 온라인 경쟁 카드 -->
             <div id="online-card" class="mode-card">
                 <h2 class="mode-title">온라인 경쟁</h2>
                 <p class="mode-description">다른 유저와 1:1로 매칭되어, 10개의 동일한 문제를 누가 더 빠르고 정확하게 푸는지 겨룹니다.</p>
@@ -51,6 +52,8 @@
         </div>
         <a href="home.html" class="btn btn-secondary" style="margin-top: 40px;">홈으로 돌아가기</a>
     </div>
+
+    <script src="js/config.js"></script>
     <script>
         function startGame(mode) {
             const difficultySelect = document.getElementById(`difficulty-${mode}`);
@@ -68,6 +71,5 @@
             }
         });
     </script>
-    <script src="js/config.js"></script>
 </body>
 </html>
