@@ -1,7 +1,7 @@
 {
-  "name": "trash-game-final",
+  "name": "trash-game-final-working",
   "version": "1.0.0",
-  "description": "Final working version of Trash Game.",
+  "description": "Fully working version of Trash Game.",
   "main": "server/server.js",
   "scripts": {
     "start": "node server/server.js"
