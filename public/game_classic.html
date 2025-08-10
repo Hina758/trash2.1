@@ -8,37 +8,21 @@
     <link rel="stylesheet" href="css/game.css">
 </head>
 <body>
-    <div class="game-container">
-        <!-- 게임 상태 표시 (HUD) -->
+    <div id="countdown-overlay" class="countdown-overlay">
+        <h1 id="countdown-text" class="countdown-text">3</h1>
+    </div>
+
+    <div class="game-container" style="visibility: hidden;">
         <div class="game-hud">
-            <div class="hud-item">
-                <span class="hud-label">문제</span>
-                <span id="question-number" class="hud-value">1 / 10</span>
-            </div>
-            <div class="hud-item">
-                <span class="hud-label">점수</span>
-                <span id="score" class="hud-value">0</span>
-            </div>
-            <div class="hud-item">
-                <span class="hud-label">콤보</span>
-                <span id="combo" class="hud-value">x0</span>
-            </div>
+            <div class="hud-item"><span class="hud-label">문제</span><span id="question-number" class="hud-value">1 / 10</span></div>
+            <div class="hud-item"><span class="hud-label">점수</span><span id="score" class="hud-value">0</span></div>
+            <div class="hud-item"><span class="hud-label">콤보</span><span id="combo" class="hud-value">x0</span></div>
         </div>
-
-        <!-- 문제 표시 영역 -->
-        <div class="question-area">
-            <h2 id="question-text" class="question-text">문제 로딩 중...</h2>
-        </div>
-
-        <!-- 정답 선택 영역 -->
-        <div id="answers-area" class="answers-area">
-            <!-- 답변 버튼이 여기에 동적으로 추가됩니다. -->
-        </div>
-
+        <div class="question-area"><h2 id="question-text" class="question-text"></h2></div>
+        <div id="answers-area" class="answers-area"></div>
         <a href="home.html" class="btn btn-secondary" style="margin-top: 30px;">게임 포기</a>
     </div>
 
-    <script src="js/config.js"></script>
     <script src="js/game_classic.js"></script>
 </body>
 </html>
