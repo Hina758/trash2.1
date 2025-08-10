@@ -1,11 +1,11 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const userData = JSON.parse(sessionStorage.getItem('loggedInUser'));
-
-    if (!userData) {
+    const userJson = sessionStorage.getItem('loggedInUser');
+    if (!userJson) {
         alert('로그인이 필요합니다.');
         window.location.href = 'login.html';
         return;
     }
+    const userData = JSON.parse(userJson);
 
     const accountTitle = document.getElementById('account-title');
     const classicScoreEl = document.getElementById('classic-score');
@@ -17,7 +17,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const titleUpdateForm = document.getElementById('title-update-form');
     const updateMessage = document.getElementById('update-message');
 
-    // 사용자 정보 표시 함수
     function displayUserInfo(user) {
         accountTitle.textContent = `${user.username}님의 계정 정보`;
         classicScoreEl.textContent = user.stats.classicHighScore || 0;
@@ -25,24 +24,20 @@ document.addEventListener('DOMContentLoaded', () => {
         onlineWinsEl.textContent = user.stats.onlineWins || 0;
         maxComboEl.textContent = user.stats.maxCombo || 0;
         titleInput.value = user.title;
-        // titleColor는 그라데이션이므로, 첫 색상만 color picker에 표시
         const firstColor = user.titleColor.match(/#([0-9a-fA-F]{6})/g);
-        if(firstColor) titleColorInput.value = firstColor[0];
+        if (firstColor) titleColorInput.value = firstColor[0];
     }
 
-    // 초기 정보 표시
     displayUserInfo(userData);
 
-    // 칭호 변경 폼 제출 이벤트
     titleUpdateForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const newTitle = titleInput.value;
         const newColor = titleColorInput.value;
-        // 간단한 그라데이션 생성
         const newTitleColor = `linear-gradient(to right, ${newColor}, #ffffff)`;
 
         try {
-            const response = await fetch('/api/auth/title', {
+            const response = await fetch(`${API_URL}/api/auth/title`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -55,7 +50,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if (result.success) {
                 updateMessage.textContent = '칭호가 성공적으로 변경되었습니다!';
                 updateMessage.style.color = 'lightgreen';
-                // 로컬 사용자 정보도 업데이트
                 userData.title = newTitle;
                 userData.titleColor = newTitleColor;
                 sessionStorage.setItem('loggedInUser', JSON.stringify(userData));

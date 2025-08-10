@@ -15,7 +15,6 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
-    // --- 게임 데이터 (다른 모드와 동일) ---
     const TRASH_DATA = [
         { item: '페트병', category: '플라스틱' }, { item: '과자 봉지', category: '비닐' },
         { item: '깨진 유리컵', category: '일반쓰레기' }, { item: '콜라 캔', category: '캔류' },
@@ -32,16 +31,16 @@ document.addEventListener('DOMContentLoaded', () => {
     let questions = [];
     let currentQuestionIndex = 0;
     const totalQuestions = 10;
-    let myScore = 0;
-    let opponentScore = 0; // 시뮬레이션용
+    let myCorrectAnswers = 0;
+    let opponentCorrectAnswers = 0;
     let timerInterval;
     let timeElapsed = 0;
     let isAnswerable = true;
+    let matchCheckInterval;
 
-    // --- 매칭 찾기 ---
     async function findMatch() {
         try {
-            const response = await fetch('/api/match/find', {
+            const response = await fetch(`${API_URL}/api/match/find`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username: userData.username })
@@ -49,26 +48,20 @@ document.addEventListener('DOMContentLoaded', () => {
             const result = await response.json();
 
             if (result.matched) {
+                clearInterval(matchCheckInterval);
                 opponent = result.opponent;
                 startGame();
-            } else {
-                // 3초마다 다시 확인
-                setTimeout(findMatch, 3000);
             }
         } catch (error) {
             console.error('매칭 오류:', error);
-            // 에러 발생 시 5초 후 재시도
-            setTimeout(findMatch, 5000);
         }
     }
 
-    // --- 게임 시작 ---
     function startGame() {
         matchingOverlay.style.display = 'none';
         gameContainer.style.visibility = 'visible';
         opponentNameEl.textContent = `상대: ${opponent}`;
         
-        // 고정된 문제 세트 (실제로는 서버에서 받아야 함)
         questions = TRASH_DATA.sort(() => 0.5 - Math.random()).slice(0, totalQuestions);
         
         timerInterval = setInterval(() => {
@@ -77,13 +70,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 100);
 
         displayNextQuestion();
-        simulateOpponent(); // 상대방 플레이 시뮬레이션
+        simulateOpponent();
     }
 
     function displayNextQuestion() {
         if (currentQuestionIndex >= totalQuestions) {
-            endGame(true); // 내가 먼저 끝냄
-            return;
+            return endGame(true);
         }
         isAnswerable = true;
         const currentQuestion = questions[currentQuestionIndex];
@@ -113,7 +105,7 @@ document.addEventListener('DOMContentLoaded', () => {
         isAnswerable = false;
 
         if (isCorrect) {
-            myScore++;
+            myCorrectAnswers++;
             button.classList.add('correct');
         } else {
             button.classList.add('wrong');
@@ -125,31 +117,35 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 500);
     }
 
-    // --- 상대방 시뮬레이션 ---
     function simulateOpponent() {
         const opponentInterval = setInterval(() => {
-            if (opponentScore < totalQuestions) {
-                opponentScore++;
-                const progress = (opponentScore / totalQuestions) * 100;
+            if (opponentCorrectAnswers < totalQuestions) {
+                opponentCorrectAnswers++;
+                const progress = (opponentCorrectAnswers / totalQuestions) * 100;
                 opponentBar.style.width = `${progress}%`;
-                opponentBar.textContent = `${opponentScore}/10`;
+                opponentBar.textContent = `${opponentCorrectAnswers}/10`;
             } else {
                 clearInterval(opponentInterval);
                 if (currentQuestionIndex < totalQuestions) {
-                    endGame(false); // 상대가 먼저 끝냄
+                    endGame(false);
                 }
             }
-        }, Math.random() * 2000 + 1000); // 1~3초마다 한 문제씩 푸는 것처럼
+        }, Math.random() * 2000 + 1000);
     }
 
-    async function endGame(iWon) {
-        clearInterval(timerInterval);
+    async function endGame(iFinishedFirst) {
+        if (timerInterval) clearInterval(timerInterval);
+        if (matchCheckInterval) clearInterval(matchCheckInterval);
         isAnswerable = false;
+        
+        // 내가 이겼는지 판정 (맞춘 개수가 많거나, 같으면 시간이 짧은 쪽)
+        // 여기서는 간단하게 먼저 끝낸 사람이 이기는 것으로 처리
+        const iWon = iFinishedFirst; 
         
         let resultMessage = '';
         if (iWon) {
             resultMessage = '승리했습니다!';
-            await fetch('/api/match/result', {
+            await fetch(`${API_URL}/api/match/result`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ winner: userData.username, loser: opponent })
@@ -166,6 +162,8 @@ document.addEventListener('DOMContentLoaded', () => {
         
         window.location.href = 'game_result.html';
     }
-
-    findMatch();
+    
+    // 3초마다 매칭 요청 시작
+    matchCheckInterval = setInterval(findMatch, 3000);
+    findMatch(); // 즉시 1회 실행
 });

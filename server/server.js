@@ -1,9 +1,8 @@
-// server/server.js
-
 const express = require('express');
 const path = require('path');
+const cors = require('cors'); // CORS 라이브러리 불러오기
 
-// 라우터 가져오기 (파일 확장자 .js 추가!)
+// 라우터 가져오기
 const authRoutes = require('./routes/auth.js');
 const scoresRoutes = require('./routes/scores.js');
 const matchRoutes = require('./routes/match.js');
@@ -12,6 +11,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // 미들웨어 설정
+app.use(cors()); // CORS 미들웨어 사용! (가장 위에 추가)
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, '..', 'public')));

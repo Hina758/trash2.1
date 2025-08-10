@@ -1,110 +1,70 @@
-// server/routes/auth.js
-const express = require('express');
-const bcrypt = require('bcryptjs');
-const { readJSON, writeJSON } = require('../utils/fileHandler');
+document.addEventListener('DOMContentLoaded', () => {
+    const signupForm = document.getElementById('signup-form');
+    const loginForm = document.getElementById('login-form');
+    const messageArea = document.getElementById('message-area');
 
-const router = express.Router();
-const USERS_FILE = 'users.json';
-
-// Helper: remove sensitive fields
-function safeUser(u) {
-  return {
-    username: u.username,
-    displayName: u.displayName || u.username,
-    title: u.title || '',
-    titleGradient: u.titleGradient || '#00A8FF,#9C88FF',
-    highScore: u.highScore || { classic: 0, infinite: 0, online: 0 },
-    maxCombo: u.maxCombo || 0,
-    onlineWins: u.onlineWins || 0,
-    createdAt: u.createdAt || null
-  };
-}
-
-// 회원가입
-// body: { username, password, passwordConfirm, displayName }
-router.post('/signup', async (req, res) => {
-  try {
-    const { username, password, passwordConfirm, displayName } = req.body;
-    if (!username || !password || !passwordConfirm) {
-      return res.status(400).json({ success: false, message: '필수 항목이 비어있습니다.' });
-    }
-    if (password !== passwordConfirm) {
-      return res.status(400).json({ success: false, message: '비밀번호 확인이 일치하지 않습니다.' });
-    }
-
-    const users = readJSON(USERS_FILE);
-    if (users.find(u => u.username === username)) {
-      return res.status(400).json({ success: false, message: '이미 존재하는 아이디입니다.' });
-    }
-
-    const hash = await bcrypt.hash(password, 10);
-    const newUser = {
-      username,
-      passwordHash: hash,
-      displayName: displayName || username,
-      title: '',
-      titleGradient: '#00A8FF,#9C88FF',
-      highScore: { classic: 0, infinite: 0, online: 0 },
-      maxCombo: 0,
-      onlineWins: 0,
-      createdAt: new Date().toISOString()
+    const showMessage = (message, isSuccess) => {
+        messageArea.textContent = message;
+        messageArea.className = 'message';
+        messageArea.classList.add(isSuccess ? 'success' : 'error');
+        messageArea.style.display = 'block';
     };
 
-    users.push(newUser);
-    writeJSON(USERS_FILE, users);
+    if (signupForm) {
+        signupForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const passwordConfirm = document.getElementById('password-confirm').value;
 
-    return res.json({ success: true, message: '회원가입이 완료되었습니다.', user: safeUser(newUser) });
-  } catch (err) {
-    console.error('signup error', err);
-    return res.status(500).json({ success: false, message: '서버 오류' });
-  }
-});
+            if (password !== passwordConfirm) {
+                return showMessage('비밀번호가 일치하지 않습니다.', false);
+            }
 
-// 로그인
-// body: { username, password }
-// returns public user info if success
-router.post('/login', async (req, res) => {
-  try {
-    const { username, password } = req.body;
-    if (!username || !password) {
-      return res.status(400).json({ success: false, message: '아이디와 비밀번호를 입력하세요.' });
+            try {
+                const response = await fetch(`${API_URL}/api/auth/signup`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                const result = await response.json();
+                if (result.success) {
+                    showMessage(result.message, true);
+                    signupForm.style.display = 'none';
+                    document.getElementById('home-button-container').classList.remove('hidden');
+                } else {
+                    showMessage(result.message, false);
+                }
+            } catch (error) {
+                console.error('Signup Error:', error);
+                showMessage('네트워크 오류가 발생했습니다.', false);
+            }
+        });
     }
 
-    const users = readJSON(USERS_FILE);
-    const user = users.find(u => u.username === username);
-    if (!user) {
-      return res.status(401).json({ success: false, message: '아이디 또는 비밀번호가 일치하지 않습니다.' });
+    if (loginForm) {
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                const response = await fetch(`${API_URL}/api/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                const result = await response.json();
+                if (result.success) {
+                    sessionStorage.setItem('loggedInUser', JSON.stringify(result.user));
+                    window.location.href = 'home.html';
+                } else {
+                    showMessage(result.message, false);
+                }
+            } catch (error) {
+                console.error('Login Error:', error);
+                showMessage('네트워크 오류가 발생했습니다.', false);
+            }
+        });
     }
-
-    const match = await bcrypt.compare(password, user.passwordHash);
-    if (!match) {
-      return res.status(401).json({ success: false, message: '아이디 또는 비밀번호가 일치하지 않습니다.' });
-    }
-
-    // 로그인 성공 — 비밀번호 해시 등 민감정보는 반환하지 않음
-    return res.json({ success: true, message: '로그인 성공', user: safeUser(user) });
-  } catch (err) {
-    console.error('login error', err);
-    return res.status(500).json({ success: false, message: '서버 오류' });
-  }
 });
-
-// 공개 프로필 조회 (간단)
-// GET /api/auth/me?username=alice
-router.get('/me', (req, res) => {
-  try {
-    const username = req.query.username;
-    if (!username) return res.status(400).json({ success: false, message: 'username 필요' });
-
-    const users = readJSON(USERS_FILE);
-    const user = users.find(u => u.username === username);
-    if (!user) return res.status(404).json({ success: false, message: '유저를 찾을 수 없습니다.' });
-
-    return res.json({ success: true, user: safeUser(user) });
-  } catch (err) {
-    console.error('me error', err);
-    return res.status(500).json({ success: false, message: '서버 오류' });
-  }
-});
-
-module.exports = router;
